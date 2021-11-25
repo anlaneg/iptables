@@ -46,12 +46,14 @@ static void u32_dump(const struct xt_u32 *data)
 	unsigned int testind, i;
 
 	printf(" \"");
+	//遍历所有tests，生成表达式
 	for (testind = 0; testind < data->ntests; ++testind) {
 		ct = &data->tests[testind];
 
 		if (testind > 0)
-			printf("&&");
+			printf("&&");//两个表达式之间 &&
 
+		//显示两个number间的运算
 		printf("0x%x", ct->location[0].number);
 		for (i = 1; i < ct->nnums; ++i) {
 			switch (ct->location[i].nextop) {
@@ -71,13 +73,18 @@ static void u32_dump(const struct xt_u32 *data)
 			printf("0x%x", ct->location[i].number);
 		}
 
+		//显示等号
 		printf("=");
+
+		//显示value
 		for (i = 0; i < ct->nvalues; ++i) {
 			if (i > 0)
 				printf(",");
 			if (ct->value[i].min == ct->value[i].max)
+			    //单值情况
 				printf("0x%x", ct->value[i].min);
 			else
+			    //范围值情况
 				printf("0x%x:0x%x", ct->value[i].min,
 				       ct->value[i].max);
 		}
@@ -273,6 +280,7 @@ static struct xtables_match u32_match = {
 	.x6_options    = u32_opts,
 };
 
+//注册u32匹配项
 void _init(void)
 {
 	xtables_register_match(&u32_match);

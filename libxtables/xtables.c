@@ -195,8 +195,8 @@ static const char *xtables_libdir;
 const char *xtables_modprobe_program;
 
 /* Keep track of matches/targets pending full registration: linked lists. */
-struct xtables_match *xtables_pending_matches;
-struct xtables_target *xtables_pending_targets;
+struct xtables_match *xtables_pending_matches;//当前注册的match链
+struct xtables_target *xtables_pending_targets;//当前注册的target链
 
 /* Keep track of fully registered external matches/targets: linked lists. */
 struct xtables_match *xtables_matches;
@@ -736,6 +736,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 	struct xtables_target *ptr;
 
 	/* Standard target? */
+	//是否标准的target
 	if (strcmp(name, "") == 0
 	    || strcmp(name, XTC_LABEL_ACCEPT) == 0
 	    || strcmp(name, XTC_LABEL_DROP) == 0
@@ -744,6 +745,7 @@ xtables_find_target(const char *name, enum xtables_tryload tryload)
 		name = "standard";
 
 	/* Trigger delayed initialization */
+	//检查扩展的target
 	for (dptr = &xtables_pending_targets; *dptr; ) {
 		if (extension_cmp(name, (*dptr)->name, (*dptr)->family)) {
 			ptr = *dptr;
@@ -902,6 +904,7 @@ static void xtables_check_options(const char *name, const struct option *opt)
 		}
 }
 
+//注册match结构
 void xtables_register_match(struct xtables_match *me)
 {
 	if (me->next) {
@@ -923,6 +926,7 @@ void xtables_register_match(struct xtables_match *me)
 		exit(1);
 	}
 
+	//版本号必须与XTABLES_VERSION相等
 	if (strcmp(me->version, XTABLES_VERSION) != 0) {
 		fprintf(stderr, "%s: match \"%s\" has version \"%s\", "
 		        "but \"%s\" is required.\n",
@@ -1095,6 +1099,7 @@ void xtables_register_matches(struct xtables_match *match, unsigned int n)
 	} while (n > 0);
 }
 
+//target注册
 void xtables_register_target(struct xtables_target *me)
 {
 	if (me->next) {
@@ -2209,11 +2214,12 @@ void get_kernel_version(void)
 
 struct xt_xlate {
 	struct {
-		char	*data;
-		int	size;
-		int	rem;
-		int	off;
+		char	*data;//输出缓冲
+		int	size;//指定缓冲最大小
+		int	rem;//指定自off开始可用位置
+		int	off;//指定起始位置
 	} buf;
+	//指定注释信息
 	char comment[NFT_USERDATA_MAXLEN];
 };
 
@@ -2244,12 +2250,14 @@ void xt_xlate_free(struct xt_xlate *xl)
 	free(xl);
 }
 
+//格式化输出到buffer中
 void xt_xlate_add(struct xt_xlate *xl, const char *fmt, ...)
 {
 	va_list ap;
 	int len;
 
 	va_start(ap, fmt);
+	//将ap按fmt格式化输出到buffer中
 	len = vsnprintf(xl->buf.data + xl->buf.off, xl->buf.rem, fmt, ap);
 	if (len < 0 || len >= xl->buf.rem)
 		xtables_error(RESOURCE_PROBLEM, "OOM");

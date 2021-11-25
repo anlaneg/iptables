@@ -71,17 +71,17 @@ struct in_addr;
  * %XTTYPE_ETHERMAC:	Ethernet MAC address in hex form
  */
 enum xt_option_type {
-	XTTYPE_NONE,
-	XTTYPE_UINT8,
+	XTTYPE_NONE,//不要求参数
+	XTTYPE_UINT8,//要求uint8参数
 	XTTYPE_UINT16,
 	XTTYPE_UINT32,
 	XTTYPE_UINT64,
-	XTTYPE_UINT8RC,
+	XTTYPE_UINT8RC,//要求冒号分隔的uint8 range参数
 	XTTYPE_UINT16RC,
 	XTTYPE_UINT32RC,
 	XTTYPE_UINT64RC,
-	XTTYPE_DOUBLE,
-	XTTYPE_STRING,
+	XTTYPE_DOUBLE,//要求double数据类型
+	XTTYPE_STRING,//要求字符串类型
 	XTTYPE_TOSMASK,
 	XTTYPE_MARKMASK32,
 	XTTYPE_SYSLOGLEVEL,
@@ -104,9 +104,9 @@ enum xt_option_type {
  * 			(only certain XTTYPEs recognize this)
  */
 enum xt_option_flags {
-	XTOPT_INVERT = 1 << 0,
+	XTOPT_INVERT = 1 << 0,/*选项可反向选择*/
 	XTOPT_MAND   = 1 << 1,
-	XTOPT_MULTI  = 1 << 2,
+	XTOPT_MULTI  = 1 << 2,/*容许使用多次*/
 	XTOPT_PUT    = 1 << 3,
 	XTOPT_NBO    = 1 << 4,
 };
@@ -124,11 +124,11 @@ enum xt_option_flags {
  * @max:	highest allowed value (for singular integral types)
  */
 struct xt_option_entry {
-	const char *name;
-	enum xt_option_type type;
-	unsigned int id, excl, also, flags;
-	unsigned int ptroff;
-	size_t size;
+	const char *name;//选项名称
+	enum xt_option_type type;//选项参数类型
+	unsigned int id/*选项id号*/, excl, also, flags;
+	unsigned int ptroff;/*到私有结构的offset*/
+	size_t size;/*在私有结构中可存储的数据长度*/
 	unsigned int min, max;
 };
 
@@ -145,11 +145,11 @@ struct xt_option_entry {
  * 		(cf. xtables_{match,target}->udata_size)
  */
 struct xt_option_call {
-	const char *arg, *ext_name;
-	const struct xt_option_entry *entry;
-	void *data;
-	unsigned int xflags;
-	bool invert;
+	const char *arg/*entry对应的参数*/, *ext_name/*扩展名称*/;
+	const struct xt_option_entry *entry;//记录选项的entry
+	void *data;/*私有数据块*/
+	unsigned int xflags;/*标明已用了哪些扩展选项*/
+	bool invert;/*是否反向选择*/
 	uint8_t nvals;
 	union {
 		uint8_t u8, u8_range[2], syslog_level, protocol;
@@ -227,12 +227,12 @@ struct xtables_match {
 	 * ABI/API version this module requires. Must be first member,
 	 * as the rest of this struct may be subject to ABI changes.
 	 */
-	const char *version;
+	const char *version;//版本号，不能为空
 
-	struct xtables_match *next;
+	struct xtables_match *next;//用于连接下一个match
 
-	const char *name;
-	const char *real_name;
+	const char *name;//匹配模块名称
+	const char *real_name;//匹配模块的real名称
 
 	/* Revision of match (0 by default). */
 	uint8_t revision;
@@ -243,15 +243,17 @@ struct xtables_match {
 	uint16_t family;
 
 	/* Size of match data. */
-	size_t size;
+	size_t size;//匹配的size,必须与struct _xt_align对齐
 
 	/* Size of match data relevant for userspace comparison purposes */
 	size_t userspacesize;
 
 	/* Function which prints out usage message. */
+	//显示此匹配的帮助信息
 	void (*help)(void);
 
 	/* Initialize the match. */
+	//初始化匹配结构体
 	void (*init)(struct xt_entry_match *m);
 
 	/* Function which parses command options; returns true if it
@@ -266,11 +268,13 @@ struct xtables_match {
 
 	/* Prints out the match iff non-NULL: put space at end */
 	/* ip is struct ipt_ip * for example */
+	//显示字符形式匹配配置
 	void (*print)(const void *ip,
-		      const struct xt_entry_match *match, int numeric);
+		      const struct xt_entry_match *match, int numeric/*是否数字形式显示*/);
 
 	/* Saves the match info in parsable form to stdout. */
 	/* ip is struct ipt_ip * for example */
+	//生成可解析的配置命令行
 	void (*save)(const void *ip, const struct xt_entry_match *match);
 
 	/* Print match name or alias */
@@ -285,6 +289,7 @@ struct xtables_match {
 	const struct xt_option_entry *x6_options;
 
 	/* Translate iptables to nft */
+	//将params转换成字符串形式输出到xl中
 	int (*xlate)(struct xt_xlate *xl,
 		     const struct xt_xlate_mt_params *params);
 
@@ -293,6 +298,7 @@ struct xtables_match {
 
 	/* Ignore these men behind the curtain: */
 	void *udata;
+	//m成员对应的option offset,每个成员加此值，获得对应的argv option
 	unsigned int option_offset;
 	struct xt_entry_match *m;
 	unsigned int mflags;
@@ -304,9 +310,9 @@ struct xtables_target {
 	 * ABI/API version this module requires. Must be first member,
 	 * as the rest of this struct may be subject to ABI changes.
 	 */
-	const char *version;
+	const char *version;//版本号，不能为空
 
-	struct xtables_target *next;
+	struct xtables_target *next;//用于串连target
 
 
 	const char *name;
@@ -320,7 +326,7 @@ struct xtables_target {
 	/* Extension flags */
 	uint8_t ext_flags;
 
-	uint16_t family;
+	uint16_t family;//支持的协议族
 
 
 	/* Size of target data. */
@@ -583,6 +589,8 @@ static inline void xtables_print_mark_mask(unsigned int mark,
 #if defined(ALL_INCLUSIVE) || defined(NO_SHARED_LIBS)
 #	ifdef _INIT
 #		undef _init
+//如果定义了_INIT，则将文件中的_init定义为_INIT,编译文件中，
+//会将_INIT变更为lib*_init
 #		define _init _INIT
 #	endif
 	extern void init_extensions(void);

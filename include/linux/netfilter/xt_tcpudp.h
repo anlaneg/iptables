@@ -28,6 +28,7 @@ struct xt_udp {
 };
 
 /* Values for "invflags" field in struct ipt_udp. */
+//反向选择标记
 #define XT_UDP_INV_SRCPT	0x01	/* Invert the sense of source ports. */
 #define XT_UDP_INV_DSTPT	0x02	/* Invert the sense of dest ports. */
 #define XT_UDP_INV_MASK	0x03	/* All possible flags. */

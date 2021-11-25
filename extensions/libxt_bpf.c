@@ -225,6 +225,7 @@ static void bpf_fcheck_v1(struct xt_fcheck_call *cb)
 			      "bpf: one of --bytecode or --pinned is required");
 }
 
+//打印匹配bpf程序
 static void bpf_print(const void *ip, const struct xt_entry_match *match,
 		      int numeric)
 {

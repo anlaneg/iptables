@@ -184,6 +184,7 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 	if (cb->entry->max != 0)
 		lmax = cb->entry->max;
 
+	//转成无符号数
 	if (!xtables_strtoul(cb->arg, NULL, &value, lmin, lmax))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: bad value for option \"--%s\", "
@@ -191,6 +192,7 @@ static void xtopt_parse_int(struct xt_option_call *cb)
 			cb->ext_name, entry->name, lmin, lmax);
 
 	if (entry->type == XTTYPE_UINT8) {
+	    //u8数据
 		cb->val.u8 = value;
 		if (entry->flags & XTOPT_PUT)
 			*(uint8_t *)XTOPT_MKPTR(cb) = cb->val.u8;
@@ -789,6 +791,7 @@ static void xtopt_parse_ethermac(struct xt_option_call *cb)
 	xt_params->exit_err(PARAMETER_PROBLEM, "Invalid MAC address specified.");
 }
 
+//参数转换函数回调
 static void (*const xtopt_subparse[])(struct xt_option_call *) = {
 	[XTTYPE_UINT8]       = xtopt_parse_int,
 	[XTTYPE_UINT16]      = xtopt_parse_int,
@@ -831,13 +834,18 @@ void xtables_option_parse(struct xt_option_call *cb)
 	 */
 	if ((!(entry->flags & XTOPT_MULTI) || (entry->excl & eflag)) &&
 	    cb->xflags & eflag)
+	    /*如果选项不容许使用多次，则检查其是否已被使用，已使用则报错*/
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: option \"--%s\" can only be used once.\n",
 			cb->ext_name, cb->entry->name);
+
+	//给定了invert,但选项不支持反向选择，报错
 	if (cb->invert && !(entry->flags & XTOPT_INVERT))
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: option \"--%s\" cannot be inverted.\n",
 			cb->ext_name, entry->name);
+
+	//选项要求参数，但没给参数，报错
 	if (entry->type != XTTYPE_NONE && optarg == NULL)
 		xt_params->exit_err(PARAMETER_PROBLEM,
 			"%s: option \"--%s\" requires an argument.\n",
@@ -848,6 +856,7 @@ void xtables_option_parse(struct xt_option_call *cb)
 	 * a *RC option type.
 	 */
 	cb->nvals = 1;
+	//对参数进行转换
 	if (entry->type < ARRAY_SIZE(xtopt_subparse) &&
 	    xtopt_subparse[entry->type] != NULL)
 		xtopt_subparse[entry->type](cb);
@@ -899,6 +908,7 @@ void xtables_option_metavalidate(const char *name,
 static const struct xt_option_entry *
 xtables_option_lookup(const struct xt_option_entry *entry, unsigned int id)
 {
+    /*给定id找到其对应的option_entry*/
 	for (; entry->name != NULL; ++entry)
 		if (entry->id == id)
 			return entry;
@@ -948,21 +958,27 @@ void xtables_option_tpcall(unsigned int c, char **argv, bool invert,
  * Dispatch arguments to the appropriate parse function, based upon the
  * extension's choice of API.
  */
-void xtables_option_mpcall(unsigned int c, char **argv, bool invert,
-			   struct xtables_match *m, void *fw)
+void xtables_option_mpcall(unsigned int c/*getopt获得的option id号*/, char **argv, bool invert/*是否反向选择*/,
+			   struct xtables_match *m/*匹配结构*/, void *fw)
 {
 	struct xt_option_call cb;
 
 	if (m->x6_parse == NULL) {
+	    /*没有x6_parse时，通过parse回调进行解析*/
 		if (m->parse != NULL)
 			m->parse(c - m->option_offset, argv, invert,
 				 &m->mflags, fw, &m->m);
 		return;
 	}
 
+	/*通过x6_parse回调完成解析*/
+
+	//减掉offset
 	c -= m->option_offset;
+	//查此option对应的entry
 	cb.entry = xtables_option_lookup(m->x6_options, c);
 	if (cb.entry == NULL)
+	    /*没有注册相关entry*/
 		xtables_error(OTHER_PROBLEM,
 			"Extension does not know id %u\n", c);
 	cb.arg      = optarg;

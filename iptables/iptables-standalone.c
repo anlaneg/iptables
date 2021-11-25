@@ -42,7 +42,7 @@ int
 iptables_main(int argc, char *argv[])
 {
 	int ret;
-	char *table = "filter";
+	char *table = "filter";/*默认使用filter表*/
 	struct xtc_handle *handle = NULL;
 
 	iptables_globals.program_name = "iptables";

@@ -73,7 +73,7 @@ struct xtables_target;
  * @so_rev_target:	optname to check revision support of target
  */
 struct xtables_afinfo {
-	const char *kmod;
+	const char *kmod;//kernel module名称
 	const char *proc_exists;
 	const char *libprefix;
 	uint8_t family;

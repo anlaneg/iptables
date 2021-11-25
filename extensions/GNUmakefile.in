@@ -98,6 +98,7 @@ clean:
 
 distclean: clean
 
+#编译会将_INIT宏定义为 "文件名_init"配合xtables.h用于替换源文件中的_init函数名
 init%.o: init%.c
 	${AM_VERBOSE_CC} ${CC} ${AM_CPPFLAGS} ${AM_DEPFLAGS} ${AM_CFLAGS} -D_INIT=$*_init ${CFLAGS} -o $@ -c $<;
 
@@ -110,6 +111,7 @@ init%.o: init%.c
 lib%.so: lib%.oo
 	${AM_VERBOSE_CCLD} ${CCLD} ${AM_LDFLAGS} ${LDFLAGS} -shared -o $@ $< -L../libxtables/.libs -lxtables ${$*_LIBADD};
 
+#编译会将_INIT宏定义为 "lib文件名_init"配合xtables.h用于替换源文件中的_init函数名
 lib%.oo: ${srcdir}/lib%.c
 	${AM_VERBOSE_CC} ${CC} ${AM_CPPFLAGS} ${AM_DEPFLAGS} ${AM_CFLAGS} -D_INIT=lib$*_init -DPIC -fPIC ${CFLAGS} -o $@ -c $<;
 
@@ -179,6 +181,7 @@ initext6_func := $(addprefix ip6t_,${pf6_build_mod})
 	cmp -s $@ $@.tmp || mv $@.tmp $@; \
 	rm -f $@.tmp;
 
+#生成init_extensions函数，用于调用lib*_init完成扩展的初始化
 initext.c: .initext.dd
 	${AM_VERBOSE_GEN}
 	@( \
