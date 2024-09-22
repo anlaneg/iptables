@@ -1303,9 +1303,9 @@ int do_command6(int argc, char *argv[], char **table,
 		case 'P':
 			add_command(&command, CMD_SET_POLICY, CMD_NONE,
 				    cs.invert);
-			chain = optarg;
+			chain = optarg; /*设置chain*/
 			if (xs_has_arg(argc, argv))
-				policy = argv[optind++];
+				policy = argv[optind++]; /*设置policy*/
 			else
 				xtables_error(PARAMETER_PROBLEM,
 					   "-%c requires a chain and a policy",
@@ -1514,10 +1514,11 @@ int do_command6(int argc, char *argv[], char **table,
 		case 1: /* non option */
 			if (optarg[0] == '!' && optarg[1] == '\0') {
 				if (cs.invert)
+					/*重复取反*/
 					xtables_error(PARAMETER_PROBLEM,
 						   "multiple consecutive ! not"
 						   " allowed");
-				cs.invert = true;
+				cs.invert = true;/*表明取反*/
 				optarg[0] = '\0';
 				continue;
 			}
@@ -1544,6 +1545,7 @@ int do_command6(int argc, char *argv[], char **table,
 	if (strcmp(*table, "nat") == 0 &&
 	    ((policy != NULL && strcmp(policy, "DROP") == 0) ||
 	    (cs.jumpto != NULL && strcmp(cs.jumpto, "DROP") == 0)))
+		/*nat表示支持drop*/
 		xtables_error(PARAMETER_PROBLEM,
 			"\nThe \"nat\" table is not intended for filtering, "
 		        "the use of DROP is therefore inhibited.\n\n");
@@ -1680,6 +1682,7 @@ int do_command6(int argc, char *argv[], char **table,
 		}
 	}
 
+	/*按command进行处理*/
 	switch (command) {
 	case CMD_APPEND:
 		ret = append_entry(chain, e,

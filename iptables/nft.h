@@ -45,6 +45,7 @@ struct nft_cache {
 };
 
 struct nft_handle {
+	/*协议族*/
 	int			family;
 	struct mnl_socket	*nl;
 	int			nlsndbuffsiz;
@@ -57,7 +58,9 @@ struct nft_handle {
 	int			obj_list_num;
 	struct nftnl_batch	*batch;
 	struct list_head	err_list;
+	/*各family对应的ops,例如：nft_family_ops_ipv4*/
 	struct nft_family_ops	*ops;
+	/*对应的内置表*/
 	const struct builtin_table *tables;
 	unsigned int		cache_index;
 	struct nft_cache	__cache[2];

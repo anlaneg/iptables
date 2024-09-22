@@ -1564,6 +1564,7 @@ static const char *standard_target_map(int verdict)
 			return LABEL_ACCEPT;
 			break;
 		case -NF_DROP-1:
+		/*target类型*/
 			return LABEL_DROP;
 			break;
 		case -NF_QUEUE-1:
@@ -2421,6 +2422,7 @@ TC_SET_POLICY(const IPT_CHAINLABEL chain,
 	if (strcmp(policy, LABEL_ACCEPT) == 0)
 		c->verdict = -NF_ACCEPT - 1;
 	else if (strcmp(policy, LABEL_DROP) == 0)
+		/*设置chain的policy*/
 		c->verdict = -NF_DROP - 1;
 	else {
 		errno = EINVAL;

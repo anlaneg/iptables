@@ -208,6 +208,7 @@ static bool xtables_fully_register_pending_target(struct xtables_target *me);
 
 void xtables_init(void)
 {
+	/*设置xtables_libdir*/
 	xtables_libdir = getenv("XTABLES_LIBDIR");
 	if (xtables_libdir != NULL)
 		return;
@@ -235,6 +236,7 @@ void xtables_init(void)
 
 void xtables_set_nfproto(uint8_t nfproto)
 {
+	/*设置nfproto对应的afinfo*/
 	switch (nfproto) {
 	case NFPROTO_IPV4:
 		afinfo = &afinfo_ipv4;

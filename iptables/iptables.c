@@ -371,8 +371,10 @@ print_header(unsigned int format, const char *chain, struct xtc_handle *handle)
 {
 	struct xt_counters counters;
 	const char *pol = iptc_get_policy(chain, &counters, handle);
+	/*显示chain名称*/
 	printf("Chain %s", chain);
 	if (pol) {
+		/*显示policy状态*/
 		printf(" (policy %s", pol);
 		if (!(format & FMT_NOCOUNTS)) {
 			fputc(' ', stdout);

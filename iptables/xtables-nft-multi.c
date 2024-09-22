@@ -8,7 +8,7 @@
 static const struct subcommand multi_subcommands[] = {
 	{"iptables-xml",		iptables_xml_main},
 	{"xml",				iptables_xml_main},
-	{"iptables",			xtables_ip4_main},
+	{"iptables",			xtables_ip4_main},/*iptables命令入口*/
 	{"iptables-nft",		xtables_ip4_main},
 	{"main4",			xtables_ip4_main},
 	{"save4",			xtables_ip4_save_main},

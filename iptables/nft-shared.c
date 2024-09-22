@@ -909,6 +909,7 @@ void print_matches_and_target(struct iptables_command_state *cs,
 	}
 }
 
+/*取各family对应的ops*/
 struct nft_family_ops *nft_family_ops_lookup(int family)
 {
 	switch (family) {

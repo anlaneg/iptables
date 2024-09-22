@@ -199,7 +199,7 @@ struct xtables_args {
 	char		iniface[IFNAMSIZ], outiface[IFNAMSIZ];
 	unsigned char	iniface_mask[IFNAMSIZ], outiface_mask[IFNAMSIZ];
 	bool		goto_set;
-	const char	*shostnetworkmask, *dhostnetworkmask;
+	const char	*shostnetworkmask/*-s指定的源地址*/, *dhostnetworkmask/*-d指定的目的地址*/;
 	const char	*pcnt, *bcnt;
 	struct addr_mask s, d;
 	unsigned long long pcnt_cnt, bcnt_cnt;
@@ -208,8 +208,8 @@ struct xtables_args {
 struct nft_xt_cmd_parse {
 	unsigned int			command;
 	unsigned int			rulenum;
-	char				*table;
-	const char			*chain;
+	char				*table;/*表名称*/
+	const char			*chain;/*chain名称*/
 	const char			*newname;
 	const char			*policy;
 	bool				restore;

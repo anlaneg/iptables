@@ -425,7 +425,7 @@ enum xtables_exittype {
 struct xtables_globals
 {
 	unsigned int option_offset;
-	const char *program_name, *program_version;
+	const char *program_name/*程序名称*/, *program_version;
 	struct option *orig_opts;
 	struct option *opts;
 	void (*exit_err)(enum xtables_exittype status, const char *msg, ...) __attribute__((noreturn, format(printf,2,3)));

@@ -793,6 +793,7 @@ int nft_init(struct nft_handle *h, int family, const struct builtin_table *t)
 {
 	memset(h, 0, sizeof(*h));
 
+	/*打开netfilter socket*/
 	h->nl = mnl_socket_open(NETLINK_NETFILTER);
 	if (h->nl == NULL)
 		return -1;
@@ -807,7 +808,7 @@ int nft_init(struct nft_handle *h, int family, const struct builtin_table *t)
 		xtables_error(PARAMETER_PROBLEM, "Unknown family");
 
 	h->portid = mnl_socket_get_portid(h->nl);
-	h->tables = t;
+	h->tables = t;/*设置的table*/
 	h->cache = &h->__cache[0];
 	h->family = family;
 

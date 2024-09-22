@@ -183,6 +183,7 @@ int command_default(struct iptables_command_state *cs,
 	xtables_error(PARAMETER_PROBLEM, "Unknown arg \"%s\"", optarg);
 }
 
+/*遍历cb，检查命称与cmd相同的，返回对应的回调函数*/
 static mainfunc_t subcmd_get(const char *cmd, const struct subcommand *cb)
 {
 	for (; cb->name != NULL; ++cb)
@@ -193,9 +194,10 @@ static mainfunc_t subcmd_get(const char *cmd, const struct subcommand *cb)
 
 int subcmd_main(int argc, char **argv, const struct subcommand *cb)
 {
-	const char *cmd = basename(*argv);
+	const char *cmd = basename(*argv);/*取程序名称*/
 	mainfunc_t f = subcmd_get(cmd, cb);
 
+	/*没有查询到function,尝试第一个参数*/
 	if (f == NULL && argc > 1) {
 		/*
 		 * Unable to find a main method for our command name?
@@ -208,8 +210,10 @@ int subcmd_main(int argc, char **argv, const struct subcommand *cb)
 
 	/* now we should have a valid function pointer */
 	if (f != NULL)
+		/*发现对应的回调，调用回调*/
 		return f(argc, argv);
 
+	/*报错*/
 	fprintf(stderr, "ERROR: No valid subcommand given.\nValid subcommands:\n");
 	for (; cb->name != NULL; ++cb)
 		fprintf(stderr, " * %s\n", cb->name);
@@ -759,8 +763,10 @@ void add_command(unsigned int *cmd, const int newcmd,
 	if (invert)
 		xtables_error(PARAMETER_PROBLEM, "unexpected '!' flag");
 	if (*cmd & (~othercmds))
+		/*命令冲突*/
 		xtables_error(PARAMETER_PROBLEM, "Cannot use -%c with -%c\n",
 			   cmd2char(newcmd), cmd2char(*cmd & (~othercmds)));
+	/*增加newcmd标记*/
 	*cmd |= newcmd;
 }
 

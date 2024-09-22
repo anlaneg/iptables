@@ -324,15 +324,18 @@ set_option(unsigned int *options, unsigned int option, uint8_t *invflg,
 	   int invert)
 {
 	if (*options & option)
+		/*此选项已被设置*/
 		xtables_error(PARAMETER_PROBLEM, "multiple -%c flags not allowed",
 			   opt2char(option));
 	*options |= option;
 
-	if (invert) {
+	if (invert/*结果反转*/) {
 		unsigned int i;
+		/*取option对应的lg(option)*/
 		for (i = 0; 1 << i != option; i++);
 
 		if (!inverse_for_options[i])
+			/*此选项被禁用用invert,报错*/
 			xtables_error(PARAMETER_PROBLEM,
 				   "cannot have ! before -%c",
 				   opt2char(option));
@@ -361,6 +364,7 @@ add_entry(const char *chain,
 				cs->fw.ip.dmsk.s_addr = d.mask.v4[j].s_addr;
 
 				if (append) {
+					/*规则添加*/
 					ret = nft_rule_append(h, chain, table,
 							      cs, NULL,
 							      verbose);
@@ -571,6 +575,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 	   demand-load a protocol. */
 	opterr = 0;
 
+	/*解析参数*/
 	opts = xt_params->orig_opts;
 	while ((cs->c = getopt_long(argc, argv,
 	   "-:A:C:D:R:I:L::S::M:F::Z::N:X::E:P:Vh::o:p:s:d:j:i:fbvw::W::nt:m:xc:g:46",
@@ -580,18 +585,21 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			 * Command selection
 			 */
 		case 'A':
+			/*添加命令*/
 			add_command(&p->command, CMD_APPEND, CMD_NONE,
 				    cs->invert);
-			p->chain = optarg;
+			p->chain = optarg;/*记录chain名称*/
 			break;
 
 		case 'C':
+			/*check命令*/
 			add_command(&p->command, CMD_CHECK, CMD_NONE,
 				    cs->invert);
 			p->chain = optarg;
 			break;
 
 		case 'D':
+			/*移除命令*/
 			add_command(&p->command, CMD_DELETE, CMD_NONE,
 				    cs->invert);
 			p->chain = optarg;
@@ -602,6 +610,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 'R':
+			/*替换命令*/
 			add_command(&p->command, CMD_REPLACE, CMD_NONE,
 				    cs->invert);
 			p->chain = optarg;
@@ -614,6 +623,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 'I':
+			/*插入命令*/
 			add_command(&p->command, CMD_INSERT, CMD_NONE,
 				    cs->invert);
 			p->chain = optarg;
@@ -624,6 +634,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 'L':
+			/*显示命令*/
 			add_command(&p->command, CMD_LIST,
 				    CMD_ZERO | CMD_ZERO_NUM, cs->invert);
 			if (optarg)
@@ -646,6 +657,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 'F':
+			/*flush命令*/
 			add_command(&p->command, CMD_FLUSH, CMD_NONE,
 				    cs->invert);
 			if (optarg)
@@ -691,6 +703,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 'E':
+			/*重命名命令*/
 			add_command(&p->command, CMD_RENAME_CHAIN, CMD_NONE,
 				    cs->invert);
 			p->chain = optarg;
@@ -750,9 +763,10 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 's':
+			/*设置srouce option*/
 			set_option(&cs->options, OPT_SOURCE,
 				   &args->invflags, cs->invert);
-			args->shostnetworkmask = optarg;
+			args->shostnetworkmask = optarg;/*设置源地址*/
 			break;
 
 		case 'd':
@@ -773,6 +787,7 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 		case 'j':
 			set_option(&cs->options, OPT_JUMP, &cs->fw.ip.invflags,
 				   cs->invert);
+			/*记录jump对应的chain*/
 			command_jump(cs, optarg);
 			break;
 
@@ -829,7 +844,9 @@ void do_parse(struct nft_handle *h, int argc, char *argv[],
 			break;
 
 		case 't':
+			/*设置table*/
 			if (cs->invert)
+				/*不容许取反*/
 				xtables_error(PARAMETER_PROBLEM,
 					   "unexpected ! flag before --table");
 			if (p->restore && table_set)
@@ -1043,10 +1060,12 @@ int do_commandx(struct nft_handle *h, int argc, char *argv[], char **table,
 		.family = h->family,
 	};
 
+	/*命令行解析*/
 	do_parse(h, argc, argv, &p, &cs, &args);
 
 	switch (p.command) {
 	case CMD_APPEND:
+		/*append新规则*/
 		ret = add_entry(p.chain, p.table, &cs, 0, h->family,
 				args.s, args.d,
 				cs.options & OPT_VERBOSE, h, true);

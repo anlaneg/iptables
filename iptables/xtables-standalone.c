@@ -91,10 +91,12 @@ xtables_main(int family, const char *progname, int argc, char *argv[])
 
 int xtables_ip4_main(int argc, char *argv[])
 {
+	/*family为ipv4*/
 	return xtables_main(NFPROTO_IPV4, "iptables", argc, argv);
 }
 
 int xtables_ip6_main(int argc, char *argv[])
 {
+	/*family为ipv6*/
 	return xtables_main(NFPROTO_IPV6, "ip6tables", argc, argv);
 }
